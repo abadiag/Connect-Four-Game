@@ -12,8 +12,8 @@ namespace FourConnect
     /// </summary>
     public partial class Table : UserControl
     {
-        public int[,] gamePlayersPosition { get; set; } = new int[7, 6];
-        public int currentPlayer { get; set; } = 1;
+        public int[,] GamePlayersPosition { get; set; } = new int[7, 6];
+        public int CurrentPlayer { get; set; } = 1;
 
         private BitmapImage[] pieces;
 
@@ -43,7 +43,7 @@ namespace FourConnect
 
                     child.Source = pieces[0];
 
-                    switch (gamePlayersPosition[col, row])
+                    switch (GamePlayersPosition[col, row])
                     {
                         case 0:
                             child.Source = pieces[0];
@@ -65,7 +65,7 @@ namespace FourConnect
         /// </summary>
         private void InitGame()
         {
-            gamePlayersPosition = GameUtils.InitGame();
+            GamePlayersPosition = GameUtils.InitGame();
             RefreshGameTableView();
         }
 
@@ -122,22 +122,22 @@ namespace FourConnect
         /// <param name="row"></param>
         private void Move(int col, int row)
         {
-            int freeLast = GameUtils.GetLastFreePositionColumn(col, gamePlayersPosition);
+            int freeLast = GameUtils.GetLastFreePositionColumn(col, GamePlayersPosition);
 
             if (freeLast > -1)
             {
-                gamePlayersPosition[col, freeLast] = currentPlayer;
+                GamePlayersPosition[col, freeLast] = CurrentPlayer;
 
                 RefreshGameTableView();
 
-                if (GameUtils.IsFinished(col, freeLast, currentPlayer, gamePlayersPosition))
+                if (GameUtils.IsFinished(col, freeLast, CurrentPlayer, GamePlayersPosition))
                 {
-                    MessageBox.Show("Finished Player" + currentPlayer.ToString() +
+                    MessageBox.Show("Finished Player" + CurrentPlayer.ToString() +
                                     " wins", "Connect four", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                     InitGame();
                 }
 
-                currentPlayer = GameUtils.SwapPlayer(currentPlayer);
+                CurrentPlayer = GameUtils.SwapPlayer(CurrentPlayer);
             }
         }
     }
