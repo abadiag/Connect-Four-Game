@@ -72,6 +72,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="GameUtils.cs" />
+    <Compile Include="IA.cs" />
+    <Compile Include="MultilayerPerceptron.cs" />
     <Compile Include="Table.xaml.cs">
       <DependentUpon>Table.xaml</DependentUpon>
     </Compile>

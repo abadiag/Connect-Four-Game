@@ -66,6 +66,7 @@ namespace FourConnect
         private void InitGame()
         {
             gamePlayersPosition = GameUtils.InitGame();
+            RefreshGameTableView();
         }
 
         /// <summary>
@@ -129,10 +130,11 @@ namespace FourConnect
 
                 RefreshGameTableView();
 
-                if (GameUtils.IsFinished(gamePlayersPosition, col, freeLast, currentPlayer, gamePlayersPosition))
+                if (GameUtils.IsFinished(col, freeLast, currentPlayer, gamePlayersPosition))
                 {
                     MessageBox.Show("Finished Player" + currentPlayer.ToString() +
                                     " wins", "Connect four", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    InitGame();
                 }
 
                 currentPlayer = GameUtils.SwapPlayer(currentPlayer);

@@ -13,8 +13,6 @@ namespace FourConnect
         {
             InitializeComponent();
             AddMainBoard();
-
-            mainBoard.RefreshGameTableView();
         }
 
         private void AddMainBoard()
