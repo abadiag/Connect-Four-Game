@@ -8,6 +8,32 @@ namespace FourConnect
     /// </summary>
     static class GameUtils
     {
+
+        public static int GetRandomNumber()
+        {
+            return new System.Random().Next(0,7);
+        }
+
+        /// <summary>
+        /// Calculate and put the current Player piece
+        /// </summary>
+        /// <param name="col"></param>
+        /// <param name="row"></param>
+        private static void Move(int col, int[,] GamePlayersPosition, int CurrentPlayer)
+        {
+            int freeLast = GameUtils.GetLastFreePositionRow(col, GamePlayersPosition);
+
+            if (freeLast > -1)
+            {
+                GamePlayersPosition[col, freeLast] = CurrentPlayer;
+
+                if (GameUtils.IsFinished(col, freeLast, CurrentPlayer, GamePlayersPosition))
+                {
+
+                }
+            }
+        }
+
         /// <summary>
         /// Reset all values of the game array to 0
         /// 0 = Empty
@@ -33,7 +59,7 @@ namespace FourConnect
         /// <param name="column"></param>
         /// <param name="gamePlayersPosition"></param>
         /// <returns></returns>
-        public static int GetLastFreePositionColumn(int column, int[,] gamePlayersPosition)
+        public static int GetLastFreePositionRow(int column, int[,] gamePlayersPosition)
         {
             int row = 0;
 
@@ -133,7 +159,7 @@ namespace FourConnect
                 if (counter > 3) return true;
             }
 
-            Debug.Print("Right & LEFT " + counter.ToString());
+            //Debug.Print("Right & LEFT " + counter.ToString());
             return false;
         }
 
@@ -161,8 +187,8 @@ namespace FourConnect
             if (Pfin1.X > width) Pfin1.X = width;
             if (Pfin1.Y > height) Pfin1.Y = height;
 
-            Debug.Print("Up left     X " + Pini1.X + "  Y " + Pini1.Y);
-            Debug.Print("Down right  X " + Pfin1.X + "  Y " + Pfin1.Y);
+            //Debug.Print("Up left     X " + Pini1.X + "  Y " + Pini1.Y);
+            //Debug.Print("Down right  X " + Pfin1.X + "  Y " + Pfin1.Y);
 
             //DIAGONAL LEFT UP TO RIGHT DOWN        
             int counter = 0;
@@ -178,7 +204,7 @@ namespace FourConnect
                 if (rowRun > height) break;
             }
 
-            Debug.Print("DIAGONAL LEFT TO RIGHT UP DOWN " + counter.ToString());
+            //Debug.Print("DIAGONAL LEFT TO RIGHT UP DOWN " + counter.ToString());
             return false;
         }
 
@@ -207,7 +233,7 @@ namespace FourConnect
             if (Pfin2.X > width) Pfin2.X = width;
             if (Pfin2.Y < 0) Pfin2.Y = 0;
 
-            Debug.Print("UP RIGHT    X " + Pfin2.X + "  Y " + Pfin2.Y);
+            //Debug.Print("UP RIGHT    X " + Pfin2.X + "  Y " + Pfin2.Y);
 
             int counter = 0;
             int rowRun = height;
@@ -218,12 +244,12 @@ namespace FourConnect
                 cellValue = gamePlayersPosition[col, rowRun];
                 if (cellValue == currentValue) { counter++; } else { counter = 0; }
                 if (counter > 3) return true;
-                Debug.Print(col.ToString() + "  " + rowRun.ToString());
+                //Debug.Print(col.ToString() + "  " + rowRun.ToString());
                 rowRun--;
                 if (rowRun < 0) break;
             }
 
-            Debug.Print("DIAGONAL LEFT TO RIGHT DOWN UP " + counter.ToString());
+            //Debug.Print("DIAGONAL LEFT TO RIGHT DOWN UP " + counter.ToString());
             return false;
         }
 
@@ -231,23 +257,21 @@ namespace FourConnect
         /// Up to down positions conscutive equal value
         /// </summary>
         /// <param name="colImpr"></param>
-        /// <param name="currentValue"></param>
+        /// <param name="currentPlayer"></param>
         /// <param name="gamePlayersPosition"></param>
         /// <returns></returns>
-        public static int GetEqualsUpDown(int colImpr, int currentValue, int[,] gamePlayersPosition)
+        public static int GetEqualsUpDown(int colImpr, int currentPlayer, int[,] gamePlayersPosition)
         {
             int row = 0;
-            int cellValue = 0;
-
-            //Vertical and horizontal calculation
-            //UP and DOWN
             int counter = 0;
 
             for (row = 0; row < 6; row++)
             {
-                cellValue = gamePlayersPosition[colImpr, row];
-                if (cellValue == currentValue) { counter++; } else { counter = 0; }
-               
+                if (gamePlayersPosition[colImpr, row] == currentPlayer)
+                {
+                    counter++;
+                    if (counter == 4) return counter;
+                }           
             }
             return counter;
         }
@@ -262,13 +286,15 @@ namespace FourConnect
         public static int GetEqualsLeftRight(int rowImpr, int currentValue, int[,] gamePlayersPosition)
         {
             int col = 0;
-            int cellValue = 0;
             int counter = 0;
 
             for (col = 0; col < 7; col++)
             {
-                cellValue = gamePlayersPosition[col, rowImpr];
-                if (cellValue == currentValue) { counter++; } else { counter = 0; }
+                if (gamePlayersPosition[col, rowImpr] == currentValue)
+                {
+                    counter++;
+                    if (counter == 4) break;
+                } 
             }
             return counter;
         }
@@ -297,8 +323,8 @@ namespace FourConnect
             if (Pfin1.X > width) Pfin1.X = width;
             if (Pfin1.Y > height) Pfin1.Y = height;
 
-            Debug.Print("Up left     X " + Pini1.X + "  Y " + Pini1.Y);
-            Debug.Print("Down right  X " + Pfin1.X + "  Y " + Pfin1.Y);
+            //Debug.Print("Up left     X " + Pini1.X + "  Y " + Pini1.Y);
+            //Debug.Print("Down right  X " + Pfin1.X + "  Y " + Pfin1.Y);
 
             //DIAGONAL LEFT UP TO RIGHT DOWN        
             int counter = 0;
@@ -308,8 +334,14 @@ namespace FourConnect
             for (int col = (int)Pini1.X; col < width + 1; col++)
             {
                 cellValue = gamePlayersPosition[col, rowRun];
-                if (cellValue == currentValue) { counter++; } else { counter = 0; }
+                if (cellValue == currentValue)
+                {
+                    counter++;
+                    if (counter == 4) break;
+
+                } else { counter = 0; }
                 rowRun++;
+
                 if (rowRun > height) break;
             }
             return counter;
@@ -340,7 +372,7 @@ namespace FourConnect
             if (Pfin2.X > width) Pfin2.X = width;
             if (Pfin2.Y < 0) Pfin2.Y = 0;
 
-            Debug.Print("UP RIGHT    X " + Pfin2.X + "  Y " + Pfin2.Y);
+            //Debug.Print("UP RIGHT    X " + Pfin2.X + "  Y " + Pfin2.Y);
 
             int counter = 0;
             int rowRun = height;
@@ -349,12 +381,33 @@ namespace FourConnect
             for (int col = (int)Pini2.X; col < width + 1; col++)
             {
                 cellValue = gamePlayersPosition[col, rowRun];
-                if (cellValue == currentValue) { counter++; } else { counter = 0; }
+                if (cellValue == currentValue)
+                {
+                    counter++;
+                    if (counter == 4) break;
+
+                } else { counter = 0; }
                 rowRun--;
                 if (rowRun < 0) break;
             }
 
             return counter;
+        }
+
+        public static int GetMaxInt(int a, int b)
+        {
+            return (a > b) ? a : b;
+        }
+
+        public static int GetSumWinTax(int a, int b, int c, int d)
+        {
+            return a + b + c + d;
+        }
+
+        public static int GetColumnMaxValue(int col1, int int1, int col2, int int2)
+        {
+            return (int1 > int2) ? col1 : col2;
+
         }
     }
 }

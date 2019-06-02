@@ -12,6 +12,9 @@ namespace FourConnect
     /// </summary>
     public partial class Table : UserControl
     {
+        public delegate void FinishMoveHandler(int[,] GamePlayersPosition, MoveEventargs moveEventargs);
+        public event FinishMoveHandler OnFinishMovement;
+
         public int[,] GamePlayersPosition { get; set; } = new int[7, 6];
         public int CurrentPlayer { get; set; } = 1;
 
@@ -112,7 +115,7 @@ namespace FourConnect
                 col++;
             }
 
-            Move(col, row);
+            Move(col, true);
         }
 
         /// <summary>
@@ -120,9 +123,9 @@ namespace FourConnect
         /// </summary>
         /// <param name="col"></param>
         /// <param name="row"></param>
-        private void Move(int col, int row)
+        public void Move(int col, bool humanMovement)
         {
-            int freeLast = GameUtils.GetLastFreePositionColumn(col, GamePlayersPosition);
+            int freeLast = GameUtils.GetLastFreePositionRow(col, GamePlayersPosition);
 
             if (freeLast > -1)
             {
@@ -138,7 +141,16 @@ namespace FourConnect
                 }
 
                 CurrentPlayer = GameUtils.SwapPlayer(CurrentPlayer);
+
+                if (humanMovement) OnFinishMovement(GamePlayersPosition, new MoveEventargs() { NextPlayer = CurrentPlayer, CurrentTable = GamePlayersPosition
+                    });
             }
         }
+    }
+
+    public class MoveEventargs : EventArgs
+    {        
+        public int NextPlayer { get; set; } 
+        public int[,]CurrentTable { get; set; }
     }
 }
