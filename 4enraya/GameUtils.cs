@@ -263,16 +263,30 @@ namespace FourConnect
         public static int GetEqualsUpDown(int colImpr, int currentPlayer, int[,] gamePlayersPosition)
         {
             int row = 0;
+            int emptyCounter = 0;
             int counter = 0;
 
             for (row = 0; row < 6; row++)
             {
+                if (gamePlayersPosition[colImpr, row] == 0)
+                {
+                    emptyCounter++;
+                }
+
                 if (gamePlayersPosition[colImpr, row] == currentPlayer)
                 {
                     counter++;
-                    if (counter == 4) return counter;
-                }           
+
+                    if (counter > 3) return 25;
+                }
+
+                if (gamePlayersPosition[colImpr, row] != currentPlayer && gamePlayersPosition[colImpr, row] != 0)
+                {
+                    if((emptyCounter + counter)- row > 3) return counter + (emptyCounter/2);
+                    return 0;
+                }
             }
+
             return counter;
         }
 
@@ -280,22 +294,34 @@ namespace FourConnect
         /// left to right  conscutive equal value
         /// </summary>
         /// <param name="rowImpr"></param>
-        /// <param name="currentValue"></param>
+        /// <param name="currentPlayer"></param>
         /// <param name="gamePlayersPosition"></param>
         /// <returns></returns>
-        public static int GetEqualsLeftRight(int rowImpr, int currentValue, int[,] gamePlayersPosition)
+        public static int GetEqualsLeftRight(int rowImpr, int currentPlayer, int[,] gamePlayersPosition)
         {
             int col = 0;
             int counter = 0;
+            int emptyCounter = 0;
 
             for (col = 0; col < 7; col++)
             {
-                if (gamePlayersPosition[col, rowImpr] == currentValue)
+                if (gamePlayersPosition[col, rowImpr] == 0)
+                {
+                    emptyCounter++;
+                }
+
+                if (gamePlayersPosition[col, rowImpr] == currentPlayer)
                 {
                     counter++;
-                    if (counter == 4) break;
-                } 
+                    if (counter > 3) return 25;  
+                }
+
+                if (gamePlayersPosition[col, rowImpr] != currentPlayer)
+                {
+                    return counter + (emptyCounter / 2);               
+                }                
             }
+
             return counter;
         }
 
@@ -323,28 +349,36 @@ namespace FourConnect
             if (Pfin1.X > width) Pfin1.X = width;
             if (Pfin1.Y > height) Pfin1.Y = height;
 
-            //Debug.Print("Up left     X " + Pini1.X + "  Y " + Pini1.Y);
-            //Debug.Print("Down right  X " + Pfin1.X + "  Y " + Pfin1.Y);
-
             //DIAGONAL LEFT UP TO RIGHT DOWN        
             int counter = 0;
             int cellValue = 0;
             int rowRun = (int)Pini1.Y;
+            int emptyCell = 0;
 
             for (int col = (int)Pini1.X; col < width + 1; col++)
             {
+                if(counter>2)Debug.Print(counter.ToString());
+
                 cellValue = gamePlayersPosition[col, rowRun];
+
                 if (cellValue == currentValue)
                 {
                     counter++;
-                    if (counter == 4) break;
+                    if (counter > 3) return 25;
+                }
+                if ((cellValue != currentValue))
+                {
+                    return counter;
+                }
 
-                } else { counter = 0; }
+                if (cellValue == 0) emptyCell++;
+
                 rowRun++;
 
-                if (rowRun > height) break;
+                if (rowRun > height-1) return counter + (emptyCell/2);            
             }
-            return counter;
+
+            return counter;            
         }
 
         /// <summary>
@@ -375,39 +409,118 @@ namespace FourConnect
             //Debug.Print("UP RIGHT    X " + Pfin2.X + "  Y " + Pfin2.Y);
 
             int counter = 0;
-            int rowRun = height;
+            int rowRun = (int)Pfin2.Y;
             int cellValue = 0;
 
-            for (int col = (int)Pini2.X; col < width + 1; col++)
+            for (int col = (int)Pini2.X; col > 0; col--)
             {
                 cellValue = gamePlayersPosition[col, rowRun];
+
                 if (cellValue == currentValue)
                 {
                     counter++;
-                    if (counter == 4) break;
+                    if (counter > 3) return 25;
 
-                } else { counter = 0; }
-                rowRun--;
-                if (rowRun < 0) break;
+                } else {  }
+
+                rowRun++;
+
+                if (rowRun > 5) return counter;
             }
 
             return counter;
         }
 
+        public static bool CellImprovement(int[]rowArray, int Player)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Max integer of two int
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public static int GetMaxInt(int a, int b)
         {
             return (a > b) ? a : b;
         }
 
+        /// <summary>
+        /// Summatory of 4 vars
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="c"></param>
+        /// <param name="d"></param>
+        /// <returns></returns>
         public static int GetSumWinTax(int a, int b, int c, int d)
         {
             return a + b + c + d;
         }
 
+        /// <summary>
+        /// Colums holder of max value
+        /// </summary>
+        /// <param name="col1"></param>
+        /// <param name="int1"></param>
+        /// <param name="col2"></param>
+        /// <param name="int2"></param>
+        /// <returns></returns>
         public static int GetColumnMaxValue(int col1, int int1, int col2, int int2)
         {
             return (int1 > int2) ? col1 : col2;
 
+        }
+
+        /// <summary>
+        /// Get column number with highes value
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static int GetColumnMaxValue(double[]array)
+        {
+            double maxValueColumn = 0;
+            int result = 0;
+
+            for (int col = 0; col < array.Length; col++)
+            {
+                if (array[col] > maxValueColumn)
+                {
+                    maxValueColumn = array[col];
+                    result = col;
+                }
+            }
+            Debug.Print(result.ToString());
+            return result;
+        }
+
+        public static double GetAverageArray(double[]array)
+        {
+            double AverageArray = 0;
+            foreach(double value in array)
+            {
+                AverageArray = AverageArray + value;
+            }
+
+            return AverageArray / array.Length;
+        }
+
+        /// <summary>
+        /// Print array of win tax
+        /// </summary>
+        /// <param name="array"></param>
+        public static void PrintArray(double[]array)
+        {
+            string result = "";
+
+            foreach(int x in array)
+            {
+                result = result + " winTax: " + x.ToString();
+            }
+
+            Debug.Print(result);
         }
     }
 }

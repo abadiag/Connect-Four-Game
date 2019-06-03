@@ -24,7 +24,8 @@ namespace FourConnect
         private void OnIAMovementPerformed(int nextPlayer)
         {
             mainBoard.Move(iAClass.NextMovement, false);
-            mainBoard.CurrentPlayer = nextPlayer;            
+            mainBoard.CurrentPlayer = nextPlayer;
+            iAClass.MakeMoveHandler(iAClass.GamePlayersPosition, nextPlayer);
         }
 
         private void OnHumanMovePerformed(int[,] GamePlayersPosition, FourConnect.MoveEventargs moveEventargs)
