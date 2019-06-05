@@ -260,69 +260,83 @@ namespace FourConnect
         /// <param name="currentPlayer"></param>
         /// <param name="gamePlayersPosition"></param>
         /// <returns></returns>
-        public static int GetEqualsUpDown(int colImpr, int currentPlayer, int[,] gamePlayersPosition)
+        public static double GetTaxWinUpToDown(int colImpr, int rowImpr, int currentPlayer, int[,] gamePlayersPosition)
         {
             int row = 0;
-            int emptyCounter = 0;
-            int counter = 0;
+            bool triggerMyCell = false;
+            int emptyCellCount = 0;
+            int PlayerCellCount = 0;
+            int indexCellOk = 1;
+            double indexEmptyCell = 0.5;
 
             for (row = 0; row < 6; row++)
             {
-                if (gamePlayersPosition[colImpr, row] == 0)
+
+                int cellValue = gamePlayersPosition[colImpr, row];
+
+                if (rowImpr == row) triggerMyCell = true;
+
+                if (cellValue == 0)
                 {
-                    emptyCounter++;
+                    emptyCellCount++;
                 }
 
-                if (gamePlayersPosition[colImpr, row] == currentPlayer)
+                if (cellValue == currentPlayer)
                 {
-                    counter++;
-
-                    if (counter > 3) return 25;
+                    PlayerCellCount++;
                 }
 
-                if (gamePlayersPosition[colImpr, row] != currentPlayer && gamePlayersPosition[colImpr, row] != 0)
+                if (cellValue != currentPlayer && cellValue != 0 && triggerMyCell)
                 {
-                    if((emptyCounter + counter)- row > 3) return counter + (emptyCounter/2);
-                    return 0;
+                    if (PlayerCellCount > 3) return 2000;
+                    return (emptyCellCount * indexEmptyCell) + (PlayerCellCount * indexCellOk);
                 }
             }
 
-            return counter;
+            return (emptyCellCount * indexEmptyCell) + (PlayerCellCount * indexCellOk);
         }
 
         /// <summary>
-        /// left to right  conscutive equal value
+        /// Calculate index Tax of win game of one move
         /// </summary>
+        /// <param name="colImpr"></param>
         /// <param name="rowImpr"></param>
-        /// <param name="currentPlayer"></param>
+        /// <param name="Player"></param>
         /// <param name="gamePlayersPosition"></param>
         /// <returns></returns>
-        public static int GetEqualsLeftRight(int rowImpr, int currentPlayer, int[,] gamePlayersPosition)
+        public static double GetTaxWinLeftToRight(int colImpr, int rowImpr, int Player, int[,] gamePlayersPosition)
         {
-            int col = 0;
-            int counter = 0;
-            int emptyCounter = 0;
+            bool triggerMyCell = false;
+            int emptyCellCount = 0;
+            int PlayerCellCount = 0;
+            int indexCellOk = 1;
+            double indexEmptyCell = 0.7;
 
-            for (col = 0; col < 7; col++)
+            Debug.Print(rowImpr.ToString());
+
+            for (int col = 0; col < gamePlayersPosition.GetLength(0); col++)
             {
-                if (gamePlayersPosition[col, rowImpr] == 0)
+                int cellValue = gamePlayersPosition[col, rowImpr];
+
+                if (col == colImpr) triggerMyCell = true;
+
+                if (cellValue == Player) PlayerCellCount++;
+                if (cellValue == 0) emptyCellCount++;
+
+                if (cellValue != Player)
                 {
-                    emptyCounter++;
+                    emptyCellCount = 0;
+                    PlayerCellCount = 0;                    
                 }
 
-                if (gamePlayersPosition[col, rowImpr] == currentPlayer)
+                if (cellValue != Player && triggerMyCell)
                 {
-                    counter++;
-                    if (counter > 3) return 25;  
+                    if (PlayerCellCount > 3) return 2000;
+                    return (emptyCellCount * indexEmptyCell )+ (PlayerCellCount * indexCellOk);
                 }
-
-                if (gamePlayersPosition[col, rowImpr] != currentPlayer)
-                {
-                    return counter + (emptyCounter / 2);               
-                }                
             }
 
-            return counter;
+            return (emptyCellCount * indexEmptyCell) + (PlayerCellCount * indexCellOk);
         }
 
         /// <summary>
@@ -333,8 +347,11 @@ namespace FourConnect
         /// <param name="currentValue"></param>
         /// <param name="gamePlayersPosition"></param>
         /// <returns></returns>
-        public static int GetEqualsDiagUpLeftDownRight(int colImpr, int rowImpr, int currentValue, int[,] gamePlayersPosition)
+        public static double GetTaxWinDiagUpLeDR(int colImpr, int rowImpr, int currentValue, int[,] gamePlayersPosition)
         {
+            int indexCellOk = 1;
+            double indexEmptyCell = 0.3;
+
             //Diagonal calculation points
             int width = gamePlayersPosition.GetLength(0) - 1;
             int height = gamePlayersPosition.GetLength(1) - 1;
@@ -357,25 +374,29 @@ namespace FourConnect
 
             for (int col = (int)Pini1.X; col < width + 1; col++)
             {
-                if(counter>2)Debug.Print(counter.ToString());
+                Debug.Print("Player" + currentValue + " counter cells " + counter.ToString() + " empty count " + emptyCell.ToString());
 
                 cellValue = gamePlayersPosition[col, rowRun];
 
                 if (cellValue == currentValue)
                 {
                     counter++;
-                    if (counter > 3) return 25;
-                }
-                if ((cellValue != currentValue))
-                {
-                    return counter;
+                    if (counter > 3) return 2000;
                 }
 
                 if (cellValue == 0) emptyCell++;
 
+                if ((cellValue != currentValue) && cellValue != 0)
+                {
+                    if (counter + emptyCell < 4) return 0;
+                    return counter;
+                }
+
+                
+
                 rowRun++;
 
-                if (rowRun > height-1) return counter + (emptyCell/2);            
+                if (rowRun > height) return (counter * indexCellOk) + (emptyCell * indexEmptyCell);            
             }
 
             return counter;            
@@ -389,8 +410,11 @@ namespace FourConnect
         /// <param name="currentValue"></param>
         /// <param name="gamePlayersPosition"></param>
         /// <returns></returns>
-        public static int GetEqualDiagDownLeftUpRight(int colImpr, int rowImpr, int currentValue, int[,] gamePlayersPosition)
+        public static double GetTaxWinDiagDLtoUR(int colImpr, int rowImpr, int currentValue, int[,] gamePlayersPosition)
         {
+            int indexCellOk = 1;
+            double indexEmptyCell = 0.3;
+
             //Diagonal calculation points
             int width = gamePlayersPosition.GetLength(0) - 1;
             int height = gamePlayersPosition.GetLength(1) - 1;
@@ -411,29 +435,30 @@ namespace FourConnect
             int counter = 0;
             int rowRun = (int)Pfin2.Y;
             int cellValue = 0;
+            int emptyCell = 0;
 
-            for (int col = (int)Pini2.X; col > 0; col--)
+            for (int col = (int)Pini2.X; col > -1; col--)
             {
                 cellValue = gamePlayersPosition[col, rowRun];
 
                 if (cellValue == currentValue)
                 {
                     counter++;
-                    if (counter > 3) return 25;
+                    if (counter > 3) return 2000;
+                }
 
-                } else {  }
+                if (cellValue == 0) emptyCell++;
 
                 rowRun++;
 
-                if (rowRun > 5) return counter;
+                if (rowRun > 5 || (cellValue != currentValue && cellValue != 0))
+                {
+                    if (counter + emptyCell < 4) return 0;
+                    return (counter * indexCellOk) + (emptyCell * indexEmptyCell);
+                }
             }
 
             return counter;
-        }
-
-        public static bool CellImprovement(int[]rowArray, int Player)
-        {
-            return false;
         }
 
         /// <summary>
@@ -479,7 +504,7 @@ namespace FourConnect
         /// </summary>
         /// <param name="array"></param>
         /// <returns></returns>
-        public static int GetColumnMaxValue(double[]array)
+        public static int GetColumnWithMaxValue(double[]array)
         {
             double maxValueColumn = 0;
             int result = 0;
@@ -492,8 +517,29 @@ namespace FourConnect
                     result = col;
                 }
             }
-            Debug.Print(result.ToString());
+            //Debug.Print(result.ToString());
             return result;
+        }
+
+        /// <summary>
+        /// Get Max value number of row
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static double GetMaxValueColumn(double[] array)
+        {
+            double maxValueColumn = 0;
+
+            for (int col = 0; col < array.Length; col++)
+            {
+                if (array[col] > maxValueColumn)
+                {
+                    maxValueColumn = array[col];
+                   
+                }
+            }
+            //Debug.Print(result.ToString());
+            return maxValueColumn;
         }
 
         public static double GetAverageArray(double[]array)

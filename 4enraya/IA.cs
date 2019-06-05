@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Windows;
 
+
 namespace IA
 {
     class IA
@@ -33,19 +34,44 @@ namespace IA
         /// <param name="gamePlayersTable"></param>
         /// <param name="MePlayer"></param>
         public void MakeMoveHandler(int[,]gamePlayersTable , int MePlayer)
-        {         
-            int column = MoveImprovement(MePlayer, gamePlayersTable);
-            Move(column, MePlayer);
+        {
+            AttakOrdefending(gamePlayersTable, MePlayer);
+        }
+
+        /// <summary>
+        /// Improve IaPlayer and Human player mevements, 
+        /// get the max tax win and column to defend 
+        /// true indicate Attak
+        /// </summary>
+        /// <returns></returns>
+        private void AttakOrdefending(int[,] gamePlayersTable, int MePlayer)
+        {
+            double[] dataIA = MoveMaxTaxColumn(MePlayer, gamePlayersTable);
+            double[] dataHuman = MoveMaxTaxColumn(FourConnect.GameUtils.SwapPlayer(MePlayer), gamePlayersTable);
+
+            if (dataIA[1] > dataHuman[1])
+            {
+                //Attack
+                Move((int)dataIA[0], MePlayer);
+                Debug.Print("Attak: IA wintax " + dataIA[1] + "  Human wintax " + dataHuman[1]);
+            }
+            else
+            {
+                //Defending
+                Move((int)dataHuman[0], MePlayer);
+                Debug.Print("Defend: Human wintax " + dataHuman[1] + "  IA wintax " + dataIA[1]);
+            }
+
         }
 
         /// <summary>
         /// Perform all movements and calculate win tax in every case, finally returns the column
-        /// with major winTax
+        /// with major winTax and Wintax of this column
         /// </summary>
         /// <param name="Player"></param>
         /// <param name="gamePlayersTable"></param>
         /// <returns></returns>
-        private int MoveImprovement(int Player, int[,]gamePlayersTable)
+        private double[]MoveMaxTaxColumn(int Player, int[,]gamePlayersTable)
         {
             GamePlayersPosition = gamePlayersTable;
             double[] winTaxByColumn = new double[GamePlayersPosition.GetLength(0)];
@@ -59,12 +85,12 @@ namespace IA
                 {
                     GamePlayersPosition[col, freeLastRow] = Player;
 
-                    double upDown = FourConnect.GameUtils.GetEqualsUpDown(freeLastRow, Player, GamePlayersPosition);
-                    double leftRight = FourConnect.GameUtils.GetEqualsLeftRight(freeLastRow, Player, GamePlayersPosition);
-                    double diagUpDown = FourConnect.GameUtils.GetEqualsDiagUpLeftDownRight(col, freeLastRow, Player, GamePlayersPosition);
-                    double diagDownLeft = FourConnect.GameUtils.GetEqualDiagDownLeftUpRight(col, freeLastRow, Player, GamePlayersPosition);
+                    double upDown = FourConnect.GameUtils.GetTaxWinUpToDown(col, freeLastRow, Player, GamePlayersPosition);
+                    double leftRight = FourConnect.GameUtils.GetTaxWinLeftToRight(col, freeLastRow, Player, GamePlayersPosition);
+                    double diagUpDown = FourConnect.GameUtils.GetTaxWinDiagUpLeDR(col, freeLastRow, Player, GamePlayersPosition);
+                    double diagDownLeft = FourConnect.GameUtils.GetTaxWinDiagDLtoUR(col, freeLastRow, Player, GamePlayersPosition);
 
-                    double ColumntaxWinTax = upDown + leftRight + diagUpDown + diagDownLeft;
+                    double ColumntaxWinTax = upDown + leftRight + ((diagUpDown + diagDownLeft)* 0.8);
 
                     winTaxByColumn[col] = ColumntaxWinTax;
 
@@ -72,12 +98,12 @@ namespace IA
                 }
             }
 
-            FourConnect.GameUtils.GetAverageArray(winTaxByColumn);
-            FourConnect.GameUtils.PrintArray(winTaxByColumn);
+            double average = FourConnect.GameUtils.GetAverageArray(winTaxByColumn);
+            //FourConnect.GameUtils.PrintArray(winTaxByColumn);
+            double maxValue = FourConnect.GameUtils.GetMaxValueColumn(winTaxByColumn);
+            int column = FourConnect.GameUtils.GetColumnWithMaxValue(winTaxByColumn);
 
-            int column = FourConnect.GameUtils.GetColumnMaxValue(winTaxByColumn);
-
-            return column;         
+            return new double[] { column, maxValue * average};         
         }
 
         /// <summary>

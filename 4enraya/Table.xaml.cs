@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -137,6 +138,7 @@ namespace FourConnect
                 {
                     MessageBox.Show("Finished Player" + CurrentPlayer.ToString() +
                                     " wins", "Connect four", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+
                     InitGame();
                 }
 

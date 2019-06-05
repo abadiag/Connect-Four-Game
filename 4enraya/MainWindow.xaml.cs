@@ -25,7 +25,7 @@ namespace FourConnect
         {
             mainBoard.Move(iAClass.NextMovement, false);
             mainBoard.CurrentPlayer = nextPlayer;
-            iAClass.MakeMoveHandler(iAClass.GamePlayersPosition, nextPlayer);
+            //iAClass.MakeMoveHandler(iAClass.GamePlayersPosition, nextPlayer);
         }
 
         private void OnHumanMovePerformed(int[,] GamePlayersPosition, FourConnect.MoveEventargs moveEventargs)
