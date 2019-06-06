@@ -286,14 +286,17 @@ namespace FourConnect
                     PlayerCellCount++;
                 }
 
+                if (PlayerCellCount > 3) return 2000;
+
                 if (cellValue != currentPlayer && cellValue != 0 && triggerMyCell)
                 {
-                    if (PlayerCellCount > 3) return 2000;
+                   
                     return (emptyCellCount * indexEmptyCell) + (PlayerCellCount * indexCellOk);
                 }
             }
 
-            return (emptyCellCount * indexEmptyCell) + (PlayerCellCount * indexCellOk);
+            return (emptyCellCount + PlayerCellCount > 3)? 
+                (emptyCellCount * indexEmptyCell) + (PlayerCellCount * indexCellOk):0;
         }
 
         /// <summary>
@@ -322,21 +325,22 @@ namespace FourConnect
 
                 if (cellValue == Player) PlayerCellCount++;
                 if (cellValue == 0) emptyCellCount++;
+                if (PlayerCellCount > 3) return 2000;
+                if (cellValue != Player && triggerMyCell)
+                {
+                    
+                    return (emptyCellCount * indexEmptyCell )+ (PlayerCellCount * indexCellOk);
+                }
 
                 if (cellValue != Player)
                 {
                     emptyCellCount = 0;
-                    PlayerCellCount = 0;                    
-                }
-
-                if (cellValue != Player && triggerMyCell)
-                {
-                    if (PlayerCellCount > 3) return 2000;
-                    return (emptyCellCount * indexEmptyCell )+ (PlayerCellCount * indexCellOk);
+                    PlayerCellCount = 0;
                 }
             }
 
-            return (emptyCellCount * indexEmptyCell) + (PlayerCellCount * indexCellOk);
+            return (emptyCellCount + PlayerCellCount > 3) ?
+                (emptyCellCount * indexEmptyCell) + (PlayerCellCount * indexCellOk) : 0;
         }
 
         /// <summary>
@@ -350,7 +354,7 @@ namespace FourConnect
         public static double GetTaxWinDiagUpLeDR(int colImpr, int rowImpr, int currentValue, int[,] gamePlayersPosition)
         {
             int indexCellOk = 1;
-            double indexEmptyCell = 0.3;
+            double indexEmptyCell = 0.5;
 
             //Diagonal calculation points
             int width = gamePlayersPosition.GetLength(0) - 1;
@@ -392,8 +396,6 @@ namespace FourConnect
                     return counter;
                 }
 
-                
-
                 rowRun++;
 
                 if (rowRun > height) return (counter * indexCellOk) + (emptyCell * indexEmptyCell);            
@@ -410,10 +412,10 @@ namespace FourConnect
         /// <param name="currentValue"></param>
         /// <param name="gamePlayersPosition"></param>
         /// <returns></returns>
-        public static double GetTaxWinDiagDLtoUR(int colImpr, int rowImpr, int currentValue, int[,] gamePlayersPosition)
+        public static double GetTaxWinDiagUrightoDownL(int colImpr, int rowImpr, int currentValue, int[,] gamePlayersPosition)
         {
             int indexCellOk = 1;
-            double indexEmptyCell = 0.3;
+            double indexEmptyCell = 0.5;
 
             //Diagonal calculation points
             int width = gamePlayersPosition.GetLength(0) - 1;
@@ -433,13 +435,13 @@ namespace FourConnect
             //Debug.Print("UP RIGHT    X " + Pfin2.X + "  Y " + Pfin2.Y);
 
             int counter = 0;
-            int rowRun = (int)Pfin2.Y;
+            int rowHighR = (int)Pfin2.Y;
             int cellValue = 0;
             int emptyCell = 0;
 
-            for (int col = (int)Pini2.X; col > -1; col--)
+            for (int col = (int)Pfin2.X; col > -1; col--)
             {
-                cellValue = gamePlayersPosition[col, rowRun];
+                cellValue = gamePlayersPosition[col, rowHighR];
 
                 if (cellValue == currentValue)
                 {
@@ -449,9 +451,9 @@ namespace FourConnect
 
                 if (cellValue == 0) emptyCell++;
 
-                rowRun++;
+                rowHighR++;
 
-                if (rowRun > 5 || (cellValue != currentValue && cellValue != 0))
+                if (rowHighR > height || (cellValue != currentValue && cellValue != 0))
                 {
                     if (counter + emptyCell < 4) return 0;
                     return (counter * indexCellOk) + (emptyCell * indexEmptyCell);
@@ -542,6 +544,11 @@ namespace FourConnect
             return maxValueColumn;
         }
 
+        /// <summary>
+        /// Get average double of array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
         public static double GetAverageArray(double[]array)
         {
             double AverageArray = 0;

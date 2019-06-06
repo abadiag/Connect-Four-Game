@@ -13,6 +13,7 @@ namespace IA
         public int[,] GamePlayersPosition { get; set; }
         public int NextMovement { get; private set; }
         private FourConnect.Table GameTable = null;
+        private bool firstMove = true;
 
         public IA(FourConnect.Table GameTable)
         {
@@ -35,7 +36,16 @@ namespace IA
         /// <param name="MePlayer"></param>
         public void MakeMoveHandler(int[,]gamePlayersTable , int MePlayer)
         {
-            AttakOrdefending(gamePlayersTable, MePlayer);
+            if (firstMove)
+            {
+                Move(FourConnect.GameUtils.GetRandomNumber(), MePlayer);
+                firstMove = false;
+            }
+            else
+            {
+                AttakOrdefending(gamePlayersTable, MePlayer);
+            }
+           
         }
 
         /// <summary>
@@ -46,8 +56,8 @@ namespace IA
         /// <returns></returns>
         private void AttakOrdefending(int[,] gamePlayersTable, int MePlayer)
         {
-            double[] dataIA = MoveMaxTaxColumn(MePlayer, gamePlayersTable);
-            double[] dataHuman = MoveMaxTaxColumn(FourConnect.GameUtils.SwapPlayer(MePlayer), gamePlayersTable);
+            double[] dataIA = GetMaxTaxColumn(MePlayer, gamePlayersTable);
+            double[] dataHuman = GetMaxTaxColumn(FourConnect.GameUtils.SwapPlayer(MePlayer), gamePlayersTable);
 
             if (dataIA[1] > dataHuman[1])
             {
@@ -71,7 +81,7 @@ namespace IA
         /// <param name="Player"></param>
         /// <param name="gamePlayersTable"></param>
         /// <returns></returns>
-        private double[]MoveMaxTaxColumn(int Player, int[,]gamePlayersTable)
+        private double[]GetMaxTaxColumn(int Player, int[,]gamePlayersTable)
         {
             GamePlayersPosition = gamePlayersTable;
             double[] winTaxByColumn = new double[GamePlayersPosition.GetLength(0)];
@@ -88,22 +98,21 @@ namespace IA
                     double upDown = FourConnect.GameUtils.GetTaxWinUpToDown(col, freeLastRow, Player, GamePlayersPosition);
                     double leftRight = FourConnect.GameUtils.GetTaxWinLeftToRight(col, freeLastRow, Player, GamePlayersPosition);
                     double diagUpDown = FourConnect.GameUtils.GetTaxWinDiagUpLeDR(col, freeLastRow, Player, GamePlayersPosition);
-                    double diagDownLeft = FourConnect.GameUtils.GetTaxWinDiagDLtoUR(col, freeLastRow, Player, GamePlayersPosition);
+                    double diagDownLeft = FourConnect.GameUtils.GetTaxWinDiagUrightoDownL(col, freeLastRow, Player, GamePlayersPosition);
 
-                    double ColumntaxWinTax = upDown + leftRight + ((diagUpDown + diagDownLeft)* 0.8);
-
+                    double ColumntaxWinTax = upDown + leftRight + ((diagUpDown + diagDownLeft));
+                    
                     winTaxByColumn[col] = ColumntaxWinTax;
 
                     GamePlayersPosition[col, freeLastRow] = 0;
                 }
             }
-
+            
             double average = FourConnect.GameUtils.GetAverageArray(winTaxByColumn);
-            //FourConnect.GameUtils.PrintArray(winTaxByColumn);
             double maxValue = FourConnect.GameUtils.GetMaxValueColumn(winTaxByColumn);
             int column = FourConnect.GameUtils.GetColumnWithMaxValue(winTaxByColumn);
 
-            return new double[] { column, maxValue * average};         
+            return new double[] { column, maxValue + average };         
         }
 
         /// <summary>
